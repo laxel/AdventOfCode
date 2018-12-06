@@ -3,7 +3,7 @@ import java.io.*;
 public class part1 {
 
     public static void main(String[] args)throws Exception {
-        File file = new File("/Users/axelkarlsson/Documents/AOC/Day1/Part1/input.txt");
+        File file = new File("input.txt");
         BufferedReader br = new BufferedReader(new FileReader(file));
 
         String st;

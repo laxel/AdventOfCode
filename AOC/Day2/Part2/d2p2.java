@@ -4,7 +4,7 @@ import java.io.*;
 public class d2p2 {
 
     public static void main(String[] args)throws Exception {
-        File file = new File("/Users/axelkarlsson/Documents/AOC/Day2/Part2/input.txt");
+        File file = new File("input.txt");
         BufferedReader br = new BufferedReader(new FileReader(file));
 
         String st;

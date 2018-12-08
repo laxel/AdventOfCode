@@ -1,7 +1,7 @@
 import java.util.*;
 import java.io.*;
 
-public class d7 {
+public class d7a {
     public static void main(String[] args) throws Exception {
         // Read input
         File file = new File("input.txt");
@@ -35,7 +35,7 @@ public class d7 {
             else
                 lockedValue.put(after, lockedValue.get(after) + 1);
         }
-        
+
         System.out.println("/-------------- PART 1 --------------/");
         PriorityQueue<Character> canPopPQ = new PriorityQueue<Character>();
         while(lockedValue.size() > 0) {

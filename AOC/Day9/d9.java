@@ -20,7 +20,6 @@ public class d9 {
 
         while(currValue < maxMarble) {
             if(modolu23Counter == 23) {
-                System.out.println(currValue);
                 modolu23Counter = 0;
                 list.goCCW(7);
                 playerScore[currPlayer - 1] += currValue + list.remove();

@@ -11,12 +11,17 @@ public class d9 {
         int numPlayers = Integer.parseInt(str.split(" ")[0]);
         int maxMarble = Integer.parseInt(str.split(" ")[6]);
 
-        MarbleList list = new MarbleList();
-        int[] playerScore = new int[numPlayers];
+        DubbleLinkedList list = new DubbleLinkedList();
+        long[] playerScore = new long[numPlayers];
         int currPlayer = 1;
         int currValue = 1;
+        int modolu23Counter = 1;
+
+
         while(currValue < maxMarble) {
-            if(currValue % 23 == 0) {
+            if(modolu23Counter == 23) {
+                System.out.println(currValue);
+                modolu23Counter = 0;
                 list.goCCW(7);
                 playerScore[currPlayer - 1] += currValue + list.remove();
             } else {
@@ -25,9 +30,10 @@ public class d9 {
             }
             currValue++;
             currPlayer++;
+            modolu23Counter++;
             if(currPlayer > numPlayers) currPlayer = 1;
         }
-        int maxScore = 0;
+        long maxScore = 0;
         for(int i = 0; i < playerScore.length; i++) {
             if(playerScore[i] > maxScore) maxScore = playerScore[i];
         }

@@ -5,15 +5,15 @@ public class Coordinate{
     public int velx;
     public int vely;
 
-    public Coordinate(int _x, int _y, int _velx, int _vely) {
-        x = _x;
-        y = _y;
-        velx = _velx;
-        vely = _vely;
+    public Coordinate(int[] input) {
+        x = input[0];
+        y = input[1];
+        velx = input[2];
+        vely = input[3];
     }
 
-    public void update() {
-        x += velx;
-        y += vely;
+    public void update(int val) {
+        x += val * velx;
+        y += val * vely;
     }
 }

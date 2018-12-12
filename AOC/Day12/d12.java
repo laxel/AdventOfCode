@@ -31,6 +31,7 @@ public class d12 {
         // Loop through 20 generations and update the list (plants)
         for(int i = 1; i <= 20; i++) {
             // Check every 5 sublist of letters
+                nextG.add(0,'.'); nextG.add(0,'.');
             for(int index = 0; index < currentG.size() - 4; index++) {
                 List<Character> subList = currentG.subList(index, index + 5);
                 StringBuilder sb = new StringBuilder();
@@ -40,11 +41,8 @@ public class d12 {
                 String currentStr = sb.toString();
                 if(spread.containsKey(currentStr)) {
                     nextG.add(spread.get(currentStr));
-                } else {                // TEMPORARY CODE, DOES NOT NEED ELSE STATEMENT
-                    nextG.add('.');
                 }
             }
-            nextG.add(0,'.'); nextG.add(0,'.');
             nextG.add('.'); nextG.add('.');
 
             for(int n = 0; n < nextG.size(); n++) {
@@ -52,6 +50,7 @@ public class d12 {
             }
             nextG.clear();
             numFrontPadding += updatePadding(currentG);
+            //System.out.println(currentG.size());
 
             // Printing
             /*for(Character c : currentG) {

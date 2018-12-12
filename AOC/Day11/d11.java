@@ -2,7 +2,6 @@
 public class d11 {
     public static void main(String[] args) throws Exception {
         int serialNumber = 1788; // Input
-
         int[] list = new int[300*300];
 
         // Find powerLevel for each coordinate

@@ -27,9 +27,11 @@ public class d12 {
             currentG.add(c);
         }
 
+
+        int gen20Score = -1;
         int numFrontPadding = updatePadding(currentG);
         // Loop through 20 generations and update the list (plants)
-        for(int i = 1; i <= 20; i++) {
+        for(int i = 1; i <= 180; i++) {
             // Check every 5 sublist of letters
                 nextG.add(0,'.'); nextG.add(0,'.');
             for(int index = 0; index < currentG.size() - 4; index++) {
@@ -52,23 +54,35 @@ public class d12 {
             numFrontPadding += updatePadding(currentG);
             //System.out.println(currentG.size());
 
-            // Printing
-            /*for(Character c : currentG) {
+
+            // Count Score
+            int score = 0;
+            int currentPlant = -numFrontPadding;
+            for(int k = 0; k < currentG.size(); k++) {
+                if (currentG.get(k).equals('#')) {
+                    score += currentPlant;
+                }
+                currentPlant++;
+            }
+            if(i == 20) gen20Score = score;
+            // --- Printing ---
+            System.out.print(i + ": "+score + " ");
+
+            // Print generation
+            for(Character c : currentG) {
                 System.out.print(c);
             }
-            System.out.println();*/
+            System.out.println();
         }
+        System.out.println("------------- PART 1 -------------");
+        System.out.println("Score for 20 generations is " + gen20Score);
+        System.out.println("------------- PART 2 -------------");
+        System.out.println("Would take way to long to run the program 5 000 000 000 times.");
+        System.out.println("Instead run for a couple of hundred times and try to find pattern.");
+        System.out.println("In my case, after generation 126 each generations score increased by 36.");
+        System.out.println("(50000000000-126)*36 + 3994 = 1799999999458");
 
-        // Count score
-        int score = 0;
-        int currentPlant = -numFrontPadding;
-        for(int i = 0; i < currentG.size(); i++) {
-            if (currentG.get(i).equals('#')) {
-                score += currentPlant;
-            }
-            currentPlant++;
-        }
-        System.out.println(score);
+
 
     }
 

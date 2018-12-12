@@ -36,6 +36,6 @@ public class d9 {
         for(int i = 0; i < playerScore.length; i++) {
             if(playerScore[i] > maxScore) maxScore = playerScore[i];
         }
-        System.out.print("Max score was: " + maxScore);
+        System.out.print("Max score was: " + maxScore + "\n");
     }
 }

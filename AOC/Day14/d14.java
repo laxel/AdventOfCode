@@ -18,14 +18,17 @@ public class d14 {
 
         int fstIndex = 0;
         int sndIndex = 1;
+        int numAdded = 0;
 
         while(list.size() < input_P1 + 10 || part2Index == -1 ) {
             int newValue = list.get(fstIndex) + list.get(sndIndex);
             if(newValue > 9) {
                 list.add(newValue / 10);
                 list.add(newValue % 10);
+                numAdded = 2;
             } else {
                 list.add(newValue);
+                numAdded = 1;
             }
             fstIndex += list.get(fstIndex) + 1;
             fstIndex = (fstIndex >= list.size()) ? fstIndex - list.size() : fstIndex;
@@ -37,21 +40,22 @@ public class d14 {
             // around the list two times.
 
             // Logic for part 2
-            if(part2Index == -1) {
+            while(numAdded > 0 && part2Index == -1) {
+                numAdded--;
                 boolean allMatch = true;
-                for(int i = 1; (i < input_p2.size()) && allMatch; i++) {
-                    if(input_p2.get(input_p2.size() - i) != list.get(list.size() - i)) {
+                for(int i = 1; (i < input_p2.size() + numAdded) && allMatch; i++) {
+                    if(input_p2.get(input_p2.size() - i) != list.get(list.size() - i - numAdded)) {
                         allMatch = false;
                     }
                 }
                 if(allMatch) {
-                    System.out.println(list.size());
-                    part2Index = list.size();
+                    part2Index = list.size() - numAdded;
                 }
             }
         }
         System.out.println("------------- PART 1 -------------");
         System.out.println(list.subList(input_P1, input_P1 + 10).toString());
-        System.out.println(part2Index - input_p2.size());
+        System.out.println("------------- PART 2 -------------");
+        System.out.println(part2Index - input_p2.size() + " elements before.");
     }
 }

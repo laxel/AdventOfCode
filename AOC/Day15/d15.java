@@ -7,11 +7,16 @@ public class d15 {
     public static final String ANSI_GREEN = "\u001B[32m";
     public static final String ANSI_WHITE = "\u001B[37m";
 
-    public static final boolean print = false;  // TRUE TO PRINT PROGRESS
+    public static final boolean print = true;  // TRUE TO PRINT PROGRESS
 
     public static void main(String[] args) throws Exception {
         // --- Read input ---
-        File file = new File("input1.txt");
+        File file;
+        if(args.length == 0) {
+            file = new File("input.txt");
+        } else {
+            file = new File(args[0]);
+        }
         BufferedReader br = new BufferedReader(new FileReader(file));
 
         ArrayList<String> list = new ArrayList<String>();
@@ -40,11 +45,23 @@ public class d15 {
 
         // Printing
         if(print) {
-            System.out.println(players.toString());
+            Collections.sort(players);
             for(int y = 0; y < map.length; y++) {
                 for(int x = 0; x < map[y].length; x++) {
-                    System.out.print(map[y][x]);
+                    if(map[y][x] == 'G') {
+                        System.out.print(ANSI_RED + 'G' + ANSI_RED);
+                    } else if(map[y][x] == 'E') {
+                        System.out.print(ANSI_GREEN + 'E' + ANSI_GREEN);
+                    } else {
+                    System.out.print(ANSI_WHITE + map[y][x] + ANSI_WHITE);
+                    }
                 }
+                for(Player p : players) {
+                    if(p.y == y) {
+                        System.out.print(" " + (p.race == 0 ? ANSI_GREEN + 'E' + ANSI_GREEN : ANSI_RED + 'G' + ANSI_RED) + "(" + p.hp + ")");
+                    }
+                }
+
                 System.out.println();
             }
             System.out.println();
@@ -67,6 +84,7 @@ public class d15 {
                 Player p = players.get(i);
 
                 int direction = shortestPath(p, players, map);
+
                 if(direction == 0) {
                     map[p.y][p.x] = '.';
                     map[p.y-1][p.x] = ((p.race == 0) ? 'E' : 'G');
@@ -90,8 +108,7 @@ public class d15 {
                 int outcome = attack(p, players, map);
                 // -1 - Didn't attack
                 // index - Attack and killed someone at index
-
-                if(outcome > 0 && outcome < i) {
+                if(outcome >= 0 && outcome < i) {
                         i--;
                 }
             }
@@ -105,6 +122,7 @@ public class d15 {
 
             // Printing
             if(print) {
+                Collections.sort(players);
                 for(int y = 0; y < map.length; y++) {
                     for(int x = 0; x < map[y].length; x++) {
                         if(map[y][x] == 'G') {
@@ -124,9 +142,8 @@ public class d15 {
                     System.out.println();
                 }
                 System.out.println();
-                Collections.sort(players);
-                TimeUnit.MILLISECONDS .sleep(1000);
-                System.out.print("\033[H\033[2J");
+                TimeUnit.MILLISECONDS .sleep(500);
+                System.out.print("\033[H\033[2J"); // clear screen
             }
             turn++;
         }
@@ -286,7 +303,7 @@ public class d15 {
                             minHP = p.hp;
                             index = i;
                         } else if(p.hp == minHP) {
-                            if(bestAttackOption.y > p.y || bestAttackOption.x < p.x) {
+                            if(bestAttackOption.y > p.y || (bestAttackOption.y == p.y && bestAttackOption.x > p.x)) {
                                 bestAttackOption = p;
                                 minHP = p.hp;
                                 index = i;
@@ -297,7 +314,6 @@ public class d15 {
         }
 
         if(bestAttackOption != null) {
-            //System.out.println("Attacked at x: " + bestAttackOption.x + ", y: " + bestAttackOption.y);
             bestAttackOption.hp -= 3;
             if(bestAttackOption.hp < 0) {
                 map[bestAttackOption.y][bestAttackOption.x] = '.';
@@ -305,7 +321,6 @@ public class d15 {
                 return index;
             }
         }
-        //System.out.println("Didn't attack");
 
         return -1;
     }

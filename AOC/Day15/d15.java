@@ -7,7 +7,7 @@ public class d15 {
     public static final String ANSI_GREEN = "\u001B[32m";
     public static final String ANSI_WHITE = "\u001B[37m";
 
-    public static final boolean print = false;
+    public static final boolean print = false;  // TRUE TO PRINT PROGRESS
 
     public static void main(String[] args) throws Exception {
         // --- Read input ---
@@ -115,9 +115,16 @@ public class d15 {
                         System.out.print(ANSI_WHITE + map[y][x] + ANSI_WHITE);
                         }
                     }
+                    for(Player p : players) {
+                        if(p.y == y) {
+                            System.out.print(" " + (p.race == 0 ? ANSI_GREEN + 'E' + ANSI_GREEN : ANSI_RED + 'G' + ANSI_RED) + "(" + p.hp + ")");
+                        }
+                    }
+
                     System.out.println();
                 }
                 System.out.println();
+                Collections.sort(players);
                 TimeUnit.MILLISECONDS .sleep(1000);
                 System.out.print("\033[H\033[2J");
             }
@@ -143,11 +150,15 @@ public class d15 {
                     System.out.print(ANSI_WHITE + map[y][x] + ANSI_WHITE);
                     }
                 }
+                for(Player p : players) {
+                    if(p.y == y) {
+                        System.out.print(" " + (p.race == 0 ? ANSI_GREEN + 'E' + ANSI_GREEN : ANSI_RED + 'G' + ANSI_RED) + "(" + p.hp + ")");
+                    }
+                }
+
                 System.out.println();
             }
             System.out.println();
-            Collections.sort(players);
-            System.out.println(players.toString());
         }
 
 
@@ -275,7 +286,7 @@ public class d15 {
                             minHP = p.hp;
                             index = i;
                         } else if(p.hp == minHP) {
-                            if(bestAttackOption.y > p.y || bestAttackOption.x > p.x) {
+                            if(bestAttackOption.y > p.y || bestAttackOption.x < p.x) {
                                 bestAttackOption = p;
                                 minHP = p.hp;
                                 index = i;

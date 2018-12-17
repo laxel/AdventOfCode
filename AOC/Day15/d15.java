@@ -122,6 +122,8 @@ public class d15 {
 
             // Printing
             if(print) {
+                TimeUnit.MILLISECONDS .sleep(500);
+                System.out.print("\033[H\033[2J"); // clear screen
                 Collections.sort(players);
                 for(int y = 0; y < map.length; y++) {
                     for(int x = 0; x < map[y].length; x++) {
@@ -142,8 +144,6 @@ public class d15 {
                     System.out.println();
                 }
                 System.out.println();
-                TimeUnit.MILLISECONDS .sleep(500);
-                System.out.print("\033[H\033[2J"); // clear screen
             }
             turn++;
         }

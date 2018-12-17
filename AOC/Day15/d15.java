@@ -13,7 +13,7 @@ public class d15 {
         // --- Read input ---
         File file;
         if(args.length == 0) {
-            file = new File("input.txt");
+            file = new File("input1.txt");
         } else {
             file = new File(args[0]);
         }
@@ -66,24 +66,31 @@ public class d15 {
             }
             System.out.println();
             TimeUnit.MILLISECONDS .sleep(1000);
-            System.out.print("\033[H\033[2J");
         }
 
         // --- Battle simulation ---
         int turn = 0;
         boolean isElves = true;
         boolean isGoblins = true;
+        boolean battleActive = true;
 
-        while(isElves && isGoblins) {
+        while(battleActive) {
             isElves = false;
             isGoblins = false;
             // Sort player list to get play order.
             Collections.sort(players);
 
             for(int i = 0; i < players.size(); i++) {
+
+                int raceSum = 0;
+                for(Player _p : players) {
+                    raceSum += _p.race;
+                }
+                if(raceSum == 0 || raceSum == players.size()) battleActive = false;
+
                 Player p = players.get(i);
 
-                int direction = shortestPath(p, players, map);
+                int direction = newShortestPath(p, players, map);
 
                 if(direction == 0) {
                     map[p.y][p.x] = '.';
@@ -112,13 +119,7 @@ public class d15 {
                         i--;
                 }
             }
-            for(Player p : players) {
-                if(p.race == 0) {
-                    isElves = true;
-                } else {
-                    isGoblins = true;
-                }
-            }
+
 
             // Printing
             if(print) {
@@ -153,10 +154,10 @@ public class d15 {
         for(Player p : players) {
             sumHP += p.hp;
         }
-        System.out.println(sumHP + " * " + turn + " = " + (sumHP * turn));
 
         // Printing again
         if(print) {
+            System.out.print("\033[H\033[2J"); // clear screen
             for(int y = 0; y < map.length; y++) {
                 for(int x = 0; x < map[y].length; x++) {
                     if(map[y][x] == 'G') {
@@ -177,7 +178,7 @@ public class d15 {
             }
             System.out.println();
         }
-
+        System.out.println(sumHP + " * " + turn + " = " + (sumHP * turn));
 
 
     }
@@ -185,14 +186,62 @@ public class d15 {
     // Calculate the direction a player should go to get to closest players
     // of a different race.
     // Upp = 0, Left = 1, Right = 2, Down = 3
-    public static int shortestPath(Player player, ArrayList<Player> players, char[][] map) {
+    public static int newShortestPath(Player player, ArrayList<Player> players, char[][] map) {
+
+        // --- Find reachable enemies ---
+
+        // Copy map to a new distanceMap
+        int[][] distanceMap = new int[map.length][map[0].length];
+        for(int y = 0; y < map.length; y++) {
+            for(int x = 0; x < map[y].length; x++) {
+                if(map[y][x] == '.') {
+                    distanceMap[y][x] = 0;
+                } else  {
+                    distanceMap[y][x] = -1;
+                }
+            }
+        }
+
+        // Update distanceMap with the distance from the player
+        int currentDist = 0;
+        boolean updatedDist = true;
+
+        while (updatedDist) {
+            updatedDist = false;
+
+            for(int y = 1; y < distanceMap.length-1; y++) {
+                for(int x = 1; x < distanceMap[y].length-1; x++) {
+                    int va = distanceMap[y][x];
+                    if((va == currentDist && currentDist != 0) || (player.x == x && player.y == y)) {
+                        if(distanceMap[y][x+1] == 0) {
+                            distanceMap[y][x+1] = currentDist+1;
+                            updatedDist = true;
+                        }
+                        if(distanceMap[y][x-1] == 0) {
+                            distanceMap[y][x-1] = currentDist+1;
+                            updatedDist = true;
+                        }
+                        if(distanceMap[y+1][x] == 0) {
+                            distanceMap[y+1][x] = currentDist+1;
+                            updatedDist = true;
+                        }
+                        if(distanceMap[y-1][x] == 0) {
+                            distanceMap[y-1][x] = currentDist+1;
+                            updatedDist = true;
+                        }
+                    }
+                }
+            }
+            currentDist++;
+        }
+
+        int xBest = Integer.MAX_VALUE;
+        int yBest = Integer.MAX_VALUE;
         int minDist = Integer.MAX_VALUE;
-        int direction = 3; // Upp 0, Left, 1, Right 2, Down 3
 
+        // Find the best point that is adjacent to an enemy
         for(int i = 0; i < players.size(); i++) {
-
             Player p = players.get(i);
-
             if(p.race != player.race) {
 
                 // Check if next to player
@@ -201,90 +250,118 @@ public class d15 {
                         return -1;
                 }
 
-                // Copy map to a new distanceMap
-                int[][] distanceMap = new int[map.length][map[0].length];
-                for(int y = 0; y < map.length; y++) {
-                    for(int x = 0; x < map[y].length; x++) {
-                        if(map[y][x] != '.') {
-                            distanceMap[y][x] = -2;
-                        } else  {
-                            distanceMap[y][x] = -1;
+                for(int n = 0; n < 4; n++) {
+                    int xDiff = (n == 0) ? 1 : ((n == 1) ? -1 : 0);
+                    int yDiff = (n == 2) ? 1 : ((n == 3) ? -1 : 0);
+
+                    if(distanceMap[p.y+yDiff][p.x+xDiff] <= minDist && distanceMap[p.y+yDiff][p.x+xDiff] > 0) {
+                        if(distanceMap[p.y+yDiff][p.x+xDiff] < minDist || (distanceMap[p.y+yDiff][p.x+xDiff] == minDist
+                            && p.x+xDiff + (p.y+yDiff)*map[0].length < xBest + yBest*map[0].length)) {
+                            xBest = p.x+xDiff;
+                            yBest = p.y+yDiff;
+                            minDist = distanceMap[p.y+yDiff][p.x+xDiff];
                         }
                     }
                 }
+            }
+        }
 
-                int currentDist = 1;
-                boolean updatedDist = true;
+        // Calculate the best way to go to the point choosen
+        distanceMap = new int[map.length][map[0].length];
+        for(int y = 0; y < map.length; y++) {
+            for(int x = 0; x < map[y].length; x++) {
+                if(map[y][x] == '.') {
+                    distanceMap[y][x] = 0;
+                } else  {
+                    distanceMap[y][x] = -1;
+                }
+            }
+        }
 
-                while (updatedDist) {
-                    updatedDist = false;
+        currentDist = 1;
+        updatedDist = true;
 
-                    for(int y = 1; y < distanceMap.length-1; y++) {
+        if(xBest != Integer.MAX_VALUE) {
+                distanceMap[yBest][xBest] = 1;
 
-                        for(int x = 1; x < distanceMap[y].length-1; x++) {
-                            int va = distanceMap[y][x];
-                            if(va == currentDist-1 || (p.x == x && p.y == y)) {
-                                if(distanceMap[y][x+1] == -1) {
-                                    distanceMap[y][x+1] = currentDist;
-                                    updatedDist = true;
-                                }
-                                if(distanceMap[y][x-1] == -1) {
-                                    distanceMap[y][x-1] = currentDist;
-                                    updatedDist = true;
-                                }
-                                if(distanceMap[y+1][x] == -1) {
-                                    distanceMap[y+1][x] = currentDist;
-                                    updatedDist = true;
-                                }
-                                if(distanceMap[y-1][x] == -1) {
-                                    distanceMap[y-1][x] = currentDist;
-                                    updatedDist = true;
-                                }
+            while (updatedDist) {
+                updatedDist = false;
+                for(int y = 1; y < distanceMap.length-1; y++) {
+                    for(int x = 1; x < distanceMap[y].length-1; x++) {
+                        int va = distanceMap[y][x];
+                        if(va == currentDist) {
+
+                            if(distanceMap[y][x+1] == 0) {
+                                distanceMap[y][x+1] = currentDist+1;
+                                updatedDist = true;
+                            }
+                            if(distanceMap[y][x-1] == 0) {
+                                distanceMap[y][x-1] = currentDist+1;
+                                updatedDist = true;
+                            }
+                            if(distanceMap[y+1][x] == 0) {
+                                distanceMap[y+1][x] = currentDist+1;
+                                updatedDist = true;
+                            }
+                            if(distanceMap[y-1][x] == 0) {
+                                distanceMap[y-1][x] = currentDist+1;
+                                updatedDist = true;
                             }
                         }
                     }
-                    currentDist++;
-
                 }
-                // Update optimal direction to go
-                if(distanceMap[player.y+1][player.x] < minDist &&
-                    distanceMap[player.y+1][player.x] > 0) {
-
-                    minDist = distanceMap[player.y+1][player.x];
-                    direction = 3;
-                }
-
-                if(distanceMap[player.y][player.x+1] > 0) {
-                    if((distanceMap[player.y][player.x+1] == minDist && direction > 2)
-                       || distanceMap[player.y][player.x+1] < minDist) {
-
-                        minDist = distanceMap[player.y][player.x+1];
-                        direction = 2;
-                    }
-                }
-
-                if(distanceMap[player.y][player.x-1] > 0) {
-                        if((distanceMap[player.y][player.x-1] == minDist && direction > 1)
-                           || distanceMap[player.y][player.x-1] < minDist) {
-
-                            minDist = distanceMap[player.y][player.x-1];
-                            direction = 1;
-                        }
-                }
-
-                if(distanceMap[player.y-1][player.x] <= minDist &&
-                    distanceMap[player.y-1][player.x] > 0) {
-
-                    minDist = distanceMap[player.y-1][player.x];
-                    direction = 0;
-                }
-
+                currentDist++;
             }
+        } else {
+            return -1;
+        }
+        /*for(int y = 0; y < distanceMap.length; y++) {
+            for(int x = 0; x < distanceMap[y].length; x++) {
+                System.out.print("["+distanceMap[y][x]+"]");
+            }
+            System.out.println();
+        }*/
+
+        minDist = Integer.MAX_VALUE;
+        int direction = 3; // Upp 0, Left, 1, Right 2, Down 3
+
+        // Update optimal direction to go
+        if(distanceMap[player.y+1][player.x] < minDist &&
+            distanceMap[player.y+1][player.x] > 0) {
+
+            minDist = distanceMap[player.y+1][player.x];
+            direction = 3;
+        }
+
+        if(distanceMap[player.y][player.x+1] > 0) {
+            if((distanceMap[player.y][player.x+1] == minDist && direction > 2)
+               || distanceMap[player.y][player.x+1] < minDist) {
+
+                minDist = distanceMap[player.y][player.x+1];
+                direction = 2;
+            }
+        }
+
+        if(distanceMap[player.y][player.x-1] > 0) {
+                if((distanceMap[player.y][player.x-1] == minDist && direction > 1)
+                   || distanceMap[player.y][player.x-1] < minDist) {
+
+                    minDist = distanceMap[player.y][player.x-1];
+                    direction = 1;
+                }
+        }
+
+        if(distanceMap[player.y-1][player.x] <= minDist &&
+            distanceMap[player.y-1][player.x] > 0) {
+
+            minDist = distanceMap[player.y-1][player.x];
+            direction = 0;
         }
 
         if(minDist == Integer.MAX_VALUE) return -1;
 
         return direction;
+
     }
 
     public static int attack(Player player, ArrayList<Player> players, char[][] map) {

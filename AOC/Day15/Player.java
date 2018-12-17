@@ -11,6 +11,11 @@ public class Player implements Comparable<Player>{
         hp = 200;
     }
 
+    public static Player copyPlayer(Player player) {
+        Player p = new Player(player.race, player.x, player.y);
+        return p;
+    }
+
     @Override
     public String toString() {
         return ((race == 0) ? "Elf: " : "Goblin: ") + "(" + x + ", " + y + ") " + hp;

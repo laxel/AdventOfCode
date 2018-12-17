@@ -7,7 +7,7 @@ public class d15 {
     public static final String ANSI_GREEN = "\u001B[32m";
     public static final String ANSI_WHITE = "\u001B[37m";
 
-    public static final boolean print = true;  // TRUE TO PRINT PROGRESS
+    public static final boolean print = false;  // TRUE TO PRINT PROGRESS
 
     public static void main(String[] args) throws Exception {
         // --- Read input ---
@@ -68,64 +68,114 @@ public class d15 {
             TimeUnit.MILLISECONDS .sleep(1000);
         }
 
-        // --- Battle simulation ---
-        int turn = 0;
-        boolean isElves = true;
-        boolean isGoblins = true;
-        boolean battleActive = true;
+        battleSimulation(players,map);
+    }
 
-        while(battleActive) {
-            isElves = false;
-            isGoblins = false;
-            // Sort player list to get play order.
-            Collections.sort(players);
+    public static void battleSimulation(ArrayList<Player> _players, char[][] _map) throws Exception {
+        int elfesStrength = 3;
+        boolean part2Completed = false;
+        int numElves = 0;
+        for(Player p : _players) {
+            if(p.race == 0) numElves++;
+        }
 
-            for(int i = 0; i < players.size(); i++) {
+        while(!part2Completed) {
+            ArrayList<Player> players = new ArrayList<Player>();
+            for(Player p : _players) players.add(Player.copyPlayer(p));
 
-                int raceSum = 0;
-                for(Player _p : players) {
-                    raceSum += _p.race;
-                }
-                if(raceSum == 0 || raceSum == players.size()) battleActive = false;
-
-                Player p = players.get(i);
-
-                int direction = newShortestPath(p, players, map);
-
-                if(direction == 0) {
-                    map[p.y][p.x] = '.';
-                    map[p.y-1][p.x] = ((p.race == 0) ? 'E' : 'G');
-                    p.y--;
-                } else if(direction == 1) {
-                    map[p.y][p.x] = '.';
-                    map[p.y][p.x-1] = ((p.race == 0) ? 'E' : 'G');
-                    p.x--;
-                } else if(direction == 2) {
-                    map[p.y][p.x] = '.';
-                    map[p.y][p.x+1] = ((p.race == 0) ? 'E' : 'G');
-                    p.x++;
-                } else if(direction == 3) {
-                    map[p.y][p.x] = '.';
-                    map[p.y+1][p.x] = ((p.race == 0) ? 'E' : 'G');
-                    p.y++;
-                }
-                // If direction = -1. Do nothing
-
-                // Check for adjacent enemies (attack)
-                int outcome = attack(p, players, map);
-                // -1 - Didn't attack
-                // index - Attack and killed someone at index
-                if(outcome >= 0 && outcome < i) {
-                        i--;
+            char[][] map = new char[_map.length][_map[0].length];
+            for(int y = 0; y < map.length; y++) {
+                for(int x = 0; x < map[y].length; x++) {
+                    map[y][x] = _map[y][x];
                 }
             }
 
+            // --- Battle simulation ---
+            int turn = 0;
+            boolean battleActive = true;
 
-            // Printing
-            if(print) {
-                TimeUnit.MILLISECONDS .sleep(500);
-                System.out.print("\033[H\033[2J"); // clear screen
+            while(battleActive) {
+                // Sort player list to get play order.
                 Collections.sort(players);
+
+                for(int i = 0; i < players.size(); i++) {
+
+                    int raceSum = 0;
+                    for(Player _p : players) {
+                        raceSum += _p.race;
+                    }
+                    if(raceSum == 0 || raceSum == players.size()) battleActive = false;
+
+                    Player p = players.get(i);
+
+                    int direction = newShortestPath(p, players, map);
+
+                    if(direction == 0) {
+                        map[p.y][p.x] = '.';
+                        map[p.y-1][p.x] = ((p.race == 0) ? 'E' : 'G');
+                        p.y--;
+                    } else if(direction == 1) {
+                        map[p.y][p.x] = '.';
+                        map[p.y][p.x-1] = ((p.race == 0) ? 'E' : 'G');
+                        p.x--;
+                    } else if(direction == 2) {
+                        map[p.y][p.x] = '.';
+                        map[p.y][p.x+1] = ((p.race == 0) ? 'E' : 'G');
+                        p.x++;
+                    } else if(direction == 3) {
+                        map[p.y][p.x] = '.';
+                        map[p.y+1][p.x] = ((p.race == 0) ? 'E' : 'G');
+                        p.y++;
+                    }
+                    // If direction = -1. Do nothing
+
+                    // Check for adjacent enemies (attack)
+                    int outcome = attack(elfesStrength, p, players, map);
+                    // -1 - Didn't attack
+                    // index - Attack and killed someone at index
+                    if(outcome >= 0 && outcome < i) {
+                            i--;
+                    }
+                }
+
+
+                // Printing
+                if(print) {
+                    TimeUnit.MILLISECONDS .sleep(500);
+                    System.out.print("\033[H\033[2J"); // clear screen
+                    Collections.sort(players);
+                    for(int y = 0; y < map.length; y++) {
+                        for(int x = 0; x < map[y].length; x++) {
+                            if(map[y][x] == 'G') {
+                                System.out.print(ANSI_RED + 'G' + ANSI_RED);
+                            } else if(map[y][x] == 'E') {
+                                System.out.print(ANSI_GREEN + 'E' + ANSI_GREEN);
+                            } else {
+                            System.out.print(ANSI_WHITE + map[y][x] + ANSI_WHITE);
+                            }
+                        }
+                        for(Player p : players) {
+                            if(p.y == y) {
+                                System.out.print(" " + (p.race == 0 ? ANSI_GREEN + 'E' + ANSI_GREEN : ANSI_RED + 'G' + ANSI_RED) + "(" + p.hp + ")");
+                            }
+                        }
+
+                        System.out.println();
+                    }
+                    System.out.println();
+                }
+                turn++;
+            }
+
+            turn--;
+            int sumHP = 0;
+            for(Player p : players) {
+                sumHP += p.hp;
+            }
+
+            // Printing again
+            if(print) {
+                System.out.print("\033[H\033[2J"); // clear screen
                 for(int y = 0; y < map.length; y++) {
                     for(int x = 0; x < map[y].length; x++) {
                         if(map[y][x] == 'G') {
@@ -146,41 +196,15 @@ public class d15 {
                 }
                 System.out.println();
             }
-            turn++;
-        }
-
-        turn--;
-        int sumHP = 0;
-        for(Player p : players) {
-            sumHP += p.hp;
-        }
-
-        // Printing again
-        if(print) {
-            System.out.print("\033[H\033[2J"); // clear screen
-            for(int y = 0; y < map.length; y++) {
-                for(int x = 0; x < map[y].length; x++) {
-                    if(map[y][x] == 'G') {
-                        System.out.print(ANSI_RED + 'G' + ANSI_RED);
-                    } else if(map[y][x] == 'E') {
-                        System.out.print(ANSI_GREEN + 'E' + ANSI_GREEN);
-                    } else {
-                    System.out.print(ANSI_WHITE + map[y][x] + ANSI_WHITE);
-                    }
-                }
-                for(Player p : players) {
-                    if(p.y == y) {
-                        System.out.print(" " + (p.race == 0 ? ANSI_GREEN + 'E' + ANSI_GREEN : ANSI_RED + 'G' + ANSI_RED) + "(" + p.hp + ")");
-                    }
-                }
-
-                System.out.println();
+            int _numElves = 0;
+            for(Player p : players) {
+                if(p.race == 0) _numElves++;
             }
-            System.out.println();
+            if(numElves == _numElves) part2Completed = true;
+
+            System.out.println(elfesStrength + ": " + turn + " * " + sumHP + " = " + (sumHP * turn));
+            elfesStrength++;
         }
-        System.out.println(sumHP + " * " + turn + " = " + (sumHP * turn));
-
-
     }
 
     // Calculate the direction a player should go to get to closest players
@@ -364,7 +388,7 @@ public class d15 {
 
     }
 
-    public static int attack(Player player, ArrayList<Player> players, char[][] map) {
+    public static int attack(int elfesStrength, Player player, ArrayList<Player> players, char[][] map) {
         Player bestAttackOption = null;
         int minHP = Integer.MAX_VALUE;
         int index = -1;
@@ -391,7 +415,11 @@ public class d15 {
         }
 
         if(bestAttackOption != null) {
-            bestAttackOption.hp -= 3;
+            if(player.race == 0) {
+                bestAttackOption.hp -= elfesStrength;
+            } else {
+                bestAttackOption.hp -= 3;
+            }
             if(bestAttackOption.hp < 0) {
                 map[bestAttackOption.y][bestAttackOption.x] = '.';
                 players.remove(index);

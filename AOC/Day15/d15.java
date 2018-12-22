@@ -7,13 +7,13 @@ public class d15 {
     public static final String ANSI_GREEN = "\u001B[32m";
     public static final String ANSI_WHITE = "\u001B[37m";
 
-    public static final boolean print = false;  // TRUE TO PRINT PROGRESS
+    public static final boolean print = true;  // TRUE TO PRINT PROGRESS
 
     public static void main(String[] args) throws Exception {
         // --- Read input ---
         File file;
         if(args.length == 0) {
-            file = new File("input1.txt");
+            file = new File("input.txt");
         } else {
             file = new File(args[0]);
         }

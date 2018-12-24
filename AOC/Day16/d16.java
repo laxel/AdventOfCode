@@ -6,12 +6,8 @@ import java.util.regex.Pattern;
 public class d16 {
     public static void main(String[] args) throws Exception {
         // --- Read input ---
-        File file;
-        if(args.length == 0) {
-            file = new File("part1.txt");
-        } else {
-            file = new File(args[0]);
-        }
+        File file = new File("part1.txt");
+
         BufferedReader br = new BufferedReader(new FileReader(file));
         Pattern p = Pattern.compile("(\\d+),? (\\d+),? (\\d+),? (\\d+)");
 
@@ -84,34 +80,63 @@ public class d16 {
 
         }
 
+        // ---------------- PART 2 ----------------
+
+        // Get the correct opcode numbers
         boolean removed = true;
-        int recentRemoved = -1;
+        int currentRemoved = -1;
+        int nextRemoved = -1;
         HashMap<Integer, Integer> correctOpcode = new HashMap<Integer, Integer>();
         while(removed) {
             removed = false;
             for(int i = 0; i < table.length ; i++) {
                 if(table[i] != null) {
                     for(int n = 0; n < table[i].size(); n++) {
-                        if((int)table[i].get(n) == recentRemoved) {
-                            System.out.println("REM: " + recentRemoved + ", from: " + i + " : " + n);
+                        if((int)table[i].get(n) == currentRemoved) {
                             table[i].remove(n);
                             n--;
                         }
                     }
 
-                    if((int)table[i].size() == 1) {
-                        recentRemoved = (int)table[i].get(0);
+                    if(table[i].size() == 1 && !removed) {
+                        nextRemoved = (int)table[i].get(0);
                         correctOpcode.put(i, (int)table[i].get(0));
                         table[i] = null;
                         removed = true;
                     }
                 }
             }
+            currentRemoved = nextRemoved;
         }
         System.out.println(correctOpcode.toString());
-        for(ArrayList l : table) {
-            System.out.println(l.toString());
+
+        // Read part2 file
+        file = new File("part2.txt");
+        br = new BufferedReader(new FileReader(file));
+
+        ArrayList<int[]> commands = new ArrayList<int[]>();
+
+        while((str = br.readLine()) != null) {
+            String[] array = str.split(" ", -1);
+            int[] intArray = new int[4];
+            for(int n = 0; n < array.length; n++) {
+                intArray[n] = Integer.parseInt(array[n]);
+            }
+            commands.add(intArray);
         }
+
+        int[] registers = new int[4];
+        for(int[] command : commands) {
+            int opcode = correctOpcode.get(command[0]);
+            int A = command[1];
+            int B = command[2];
+            int C = command[3];
+            registers = opcode(opcode, A, B, C, registers);
+        }
+        for(int i : registers) {
+            System.out.print(i + ", ");
+        }
+        System.out.println();
 
         System.out.println(numThreeOrMore);
 

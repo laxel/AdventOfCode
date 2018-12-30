@@ -6,6 +6,14 @@ import java.awt.Point;
 import java.util.concurrent.TimeUnit;
 
 public class d17 {
+
+    public static final String ANSI_YELLOW_BACKGROUND = "\u001B[43m";
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_BLUE = "\u001B[34m";
+
+    public static char[][] map;
+    public static ArrayList<Point> currentUpdate;
+
     public static void main(String[] args) throws Exception {
         // --- Read input ---
         boolean shouldPrint = false;
@@ -48,7 +56,7 @@ public class d17 {
              }
         }
 
-        char[][] map = new char[extValues[1] - extValues[0]+1][extValues[3]-extValues[2]];
+        map = new char[extValues[1] - extValues[0]+1][extValues[3]-extValues[2]];
         for(int y = 0; y < map[0].length; y++) {
             for(int x = 0; x < map.length; x++) {
                 map[x][y] = '.';
@@ -74,18 +82,9 @@ public class d17 {
         }
 
         //Printing
-        if(shouldPrint) {
-            System.out.print("\033[H\033[2J"); // clear screen
-            for(int y = 0; y < map[0].length; y++) {
-                for(int x = 0; x < map.length; x++) {
-                    System.out.print(map[x][y]);
-                }
-                System.out.println();
-            }
-        }
+        if(shouldPrint) printMap();
 
-
-        ArrayList<Point> currentUpdate = new ArrayList<Point>();
+        currentUpdate = new ArrayList<Point>();
         currentUpdate.add(new Point(500 - extValues[0],0));
 
         // Water simulation
@@ -145,16 +144,8 @@ public class d17 {
             currentUpdate = nextUpdate;
 
             //Printing
-            if(shouldPrint) {
-                TimeUnit.MILLISECONDS .sleep(500);
-                System.out.print("\033[H\033[2J"); // clear screen
-                for(int y = 0; y < map[0].length; y++) {
-                    for(int x = 0; x < map.length; x++) {
-                        System.out.print(map[x][y]);
-                    }
-                    System.out.println();
-                }
-            }
+            if(shouldPrint) printMap();
+
 
         }
 
@@ -168,8 +159,42 @@ public class d17 {
         }
         System.out.println("Number of watertiles " + sumWater);
         System.out.println("Number of still watertiles: " + sumStillWater);
+    }
+
+    public static void printMap() throws Exception {
+        TimeUnit.MILLISECONDS .sleep(100);
+        System.out.print("\033[H\033[2J"); // clear screen
+
+        if(map.length < 50) {
+            for(int y = 0; y < map[0].length; y++) {
+                for(int x = 0; x < map.length; x++) {
+                    if(map[x][y] == '.') System.out.print( ANSI_YELLOW_BACKGROUND + ' ' + ANSI_RESET);
+                    if(map[x][y] == '#') System.out.print( ANSI_YELLOW_BACKGROUND + '#' + ANSI_RESET);
+                    if(map[x][y] == '~') System.out.print(ANSI_YELLOW_BACKGROUND + ANSI_BLUE + '~' + ANSI_RESET);
+                    if(map[x][y] == '|') System.out.print(ANSI_YELLOW_BACKGROUND + ANSI_BLUE + '|' + ANSI_RESET);
+
+                }
+                System.out.println();
+            }
+        } else if(currentUpdate != null && !currentUpdate.isEmpty()){
+            Point p = currentUpdate.get(0);
+            int yMin = p.y-15 < 0 ? 0 : p.y-15;
+            int yMax = p.y+15 > map[0].length ? map[0].length : p.y+15;
+            int xMin = p.x-25 < 0 ? 0 : p.x-25;
+            int xMax = p.x+25 > map.length ? map.length : p.x + 25;
 
 
+            for(int y = yMin; y < yMax; y++) {
+                for(int x = xMin; x < xMax; x++) {
+                    if(map[x][y] == '.') System.out.print( ANSI_YELLOW_BACKGROUND + ' ' + ANSI_RESET);
+                    if(map[x][y] == '#') System.out.print( ANSI_YELLOW_BACKGROUND + '#' + ANSI_RESET);
+                    if(map[x][y] == '~') System.out.print(ANSI_YELLOW_BACKGROUND + ANSI_BLUE + '~' + ANSI_RESET);
+                    if(map[x][y] == '|') System.out.print(ANSI_YELLOW_BACKGROUND + ANSI_BLUE + '|' + ANSI_RESET);
+
+                }
+                System.out.println();
+            }
+        }
 
     }
 }

@@ -1,0 +1,60 @@
+* * * * * * * * *  *  * * *  * * * _
+2 3 1 2 0 2 4 3 11 12 0 1 99 1 1 2
+A---------------------------------
+    B---------------- D-----
+        C------
+* * * * * _
+0 3 1 2 3
+A
+
+StartBarn Stacken:
+Barn stacken:
+Värde Stacken:
+Nod stacken:        A
+
+Steg 1:
+    Kolla på antalet barn och värden.
+    Ge antal barn till barn stacken
+    Ge antal värden till värde stacken
+
+Steg 2:
+    Om värdet i barn stacken är större än noll
+        Gå till nästa barn (Gå två steg frammåt)
+        --> STEG 1
+
+    Annars
+        Skapa ny nod, Gå två steg frammåt,
+        ta översta värdet från värdestacken och loopa igenom dem och lägg i noden
+        (gå så många steg framåt)
+        Ta översta värdet i barn stacken
+        Lägg noden i Nod stacken.
+
+
+loop:   Om högsta värdet på barn stacken är större än ett
+            Minska det högsta värdet på barn stacken med 1.
+            --> STEG 1
+        Annars
+            Skapa ny nod, Ta översta värdet från värde stacken
+            loopa igenom antalet steg och lägg värderna i noden
+            Ta värdet från nod stacken och lägg i noden
+            (gå så många steg framåt)
+            Lägg noden i Nod stacken.
+
+            Ta översta värdet i barn stacken
+
+            Om det finns värden i barn stacken
+                Gå till loop
+            Annars
+                Klar
+
+
+* * * * *  *  *  * * * * *  * * * *  * * * * _
+2 3 0 3 10 11 12 2 1 0 1 99 0 2 6 32 2 1 1 2
+A-------------------------------------------
+    B----------- C--------------------
+                     D----- E-------
+B - null - 10,11,12
+D - null - 99
+E - null - 6,32
+C -  {D,E} - 2
+A - {B,C} - 1,1,2

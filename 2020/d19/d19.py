@@ -1,4 +1,4 @@
-import itertools
+import re
 
 # === Parsing ===
 f = open("input.txt")
@@ -22,67 +22,42 @@ for l in ls:
             d[k] = [list(map(lambda x: int(x), ss[0].split(" "))), \
                     list(map(lambda x: int(x), ss[1].split(" ")))]
 
-# === Functions
-# Creates a traversel list to be used when testing a msg
-def check_key(k):
+# === Create regex expression ===
+# k: key to check
+# m_d: max depth (-1 -> no depth limit)
+def check_key(k, m_d):
+    return _check_key(k,m_d,0)
+
+def _check_key(k,m_d,c_d):
+    c_d += 1
+    if m_d != -1 and c_d > m_d:
+        return 'c' # Will never match
+
     vs = d[k]
     if type(vs) is str:
         return vs
     elif len(vs) == 1:
-        a = vs[0]
-        answ_a = list(map(lambda x: check_key(x),  a))
-        return [answ_a]
+        return "(" + "".join(list(map(lambda x: "(" + _check_key(x, m_d, c_d) + ")",  vs[0]))) + ")"
     else:
-        a = vs[0]
-        b = vs[1]
-        answ_a = list(map(lambda x: check_key(x),  a))
-        answ_b = list(map(lambda x: check_key(x),  b))
-        return [answ_a, answ_b]
+        a_s = "".join(list(map(lambda x: "(" + _check_key(x, m_d, c_d) + ")",  vs[0])))
+        b_s = "".join(list(map(lambda x: "(" + _check_key(x, m_d, c_d) + ")",  vs[1])))
+        return "(" + a_s + "|" + b_s + ")"
 
-# Traverse throught the travers list and check if msg is correct
-def traverse(t,answ):
-    b, i = _traverse(t,answ,0)
-    return b and i == len(answ)
-
-def _traverse(t, answ, i):
-    # "c"
-    if type(t) is str: 
-        
-        if 0 <= i < len(answ):
-            return [answ[i] == t, i+1]
-        else:
-            return [False, i+1]
-    # [a]
-    elif len(t) == 1: 
-        for st in t[0]:
-            b, i = _traverse(st, answ, i)
-            if not b:
-                return [False,i]
-        return [True,i]
-    # [[a] | [b]]
-    else:
-        j = i
-        did_break = False
-        for st in t[0]:
-            b, j = _traverse(st, answ, j)
-            if not b:
-                did_break = True
-                break
-        if not did_break:
-            return [True, j]
-        for st in t[1]:
-            b, i = _traverse(st, answ, i)
-            if not b:
-                return [False,i]
-        return [True,i]
-    return [True, i]
-
-# === Part 1 ===
-trav = check_key(0)
-
-num_hit = 0
+re_exp = "^" + check_key(0,-1) + "$"
+p1_match = 0
 for m in mgs:
-    if traverse(trav, m):
-        num_hit += 1
-print("/P1/ Messages that match: " + str(num_hit))
+    if re.match(re_exp, m):
+        p1_match += 1
+print("/P1/ Messages that match: " + str(p1_match))
 
+# === Part 2 ===
+d[8] = [[42],[42,8]]
+d[11] = [[42,31],[42,11,31]]
+
+# Depth of 15 was enought for me, might vary slightly for different inputs
+re_exp = "^" + check_key(0,15) + "$"
+p2_match = 0
+for m in mgs:
+    if re.match(re_exp, m):
+        p2_match += 1
+print("/P2/ Messages that match: " + str(p2_match))

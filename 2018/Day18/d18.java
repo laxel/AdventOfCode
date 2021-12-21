@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit;
 
 public class d18 {
 
-    public static final boolean print = false;
+    public static final boolean print = true;
 
     public static void main(String[] args) throws Exception {
         // Read input

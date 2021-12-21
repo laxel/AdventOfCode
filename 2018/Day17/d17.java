@@ -16,7 +16,7 @@ public class d17 {
 
     public static void main(String[] args) throws Exception {
         // --- Read input ---
-        boolean shouldPrint = false;
+        boolean shouldPrint = true;
         File file = new File("input.txt");
         if(args.length == 1) {
             file = new File(args[0]);
@@ -162,8 +162,8 @@ public class d17 {
     }
 
     public static void printMap() throws Exception {
-        TimeUnit.MILLISECONDS .sleep(100);
-        System.out.print("\033[H\033[2J"); // clear screen
+        TimeUnit.MILLISECONDS .sleep(50);
+        //System.out.print("\033[H\033[2J"); // clear screen
 
         if(map.length < 50) {
             for(int y = 0; y < map[0].length; y++) {
@@ -178,22 +178,35 @@ public class d17 {
             }
         } else if(currentUpdate != null && !currentUpdate.isEmpty()){
             Point p = currentUpdate.get(0);
-            int yMin = p.y-15 < 0 ? 0 : p.y-15;
-            int yMax = p.y+15 > map[0].length ? map[0].length : p.y+15;
-            int xMin = p.x-25 < 0 ? 0 : p.x-25;
-            int xMax = p.x+25 > map.length ? map.length : p.x + 25;
+            int height = 30;
+            int width = 100;
+            String tot = "";
 
+            int yMin = p.y-height < 0 ? 0 : p.y-height;
+            int yMax = p.y+height > map[0].length ? map[0].length : p.y+height;
+            int xMin = p.x-width < 0 ? 0 : p.x-width;
+            int xMax = p.x+width > map.length ? map.length : p.x + width;
+            
 
             for(int y = yMin; y < yMax; y++) {
                 for(int x = xMin; x < xMax; x++) {
+                    /*
                     if(map[x][y] == '.') System.out.print( ANSI_YELLOW_BACKGROUND + ' ' + ANSI_RESET);
                     if(map[x][y] == '#') System.out.print( ANSI_YELLOW_BACKGROUND + '#' + ANSI_RESET);
                     if(map[x][y] == '~') System.out.print(ANSI_YELLOW_BACKGROUND + ANSI_BLUE + '~' + ANSI_RESET);
                     if(map[x][y] == '|') System.out.print(ANSI_YELLOW_BACKGROUND + ANSI_BLUE + '|' + ANSI_RESET);
+                    */
+                    if(map[x][y] == '.') tot += ( ANSI_YELLOW_BACKGROUND + ' ' + ANSI_RESET);
+                    if(map[x][y] == '#') tot += ( ANSI_YELLOW_BACKGROUND + '#' + ANSI_RESET);
+                    if(map[x][y] == '~') tot += (ANSI_YELLOW_BACKGROUND + ANSI_BLUE + '~' + ANSI_RESET);
+                    if(map[x][y] == '|') tot += (ANSI_YELLOW_BACKGROUND + ANSI_BLUE + '|' + ANSI_RESET);
 
                 }
-                System.out.println();
+                tot += "\n";
             }
+            System.out.print("\033[H\033[2J"); // clear screen
+            System.out.println(tot);
+
         }
 
     }

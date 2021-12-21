@@ -1,0 +1,7 @@
+Measuring 'real' execution time for different implementations
+
+Python Doubly linked list:
+20,036s 20,473s 20,047s
+
+Python Singely Linked list:
+19,055s 18,913s 19,008s

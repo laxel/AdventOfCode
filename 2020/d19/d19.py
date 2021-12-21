@@ -43,6 +43,7 @@ def _check_key(k,m_d,c_d):
         b_s = "".join(list(map(lambda x: "(" + _check_key(x, m_d, c_d) + ")",  vs[1])))
         return "(" + a_s + "|" + b_s + ")"
 
+# === Part 1 ===
 re_exp = "^" + check_key(0,-1) + "$"
 p1_match = 0
 for m in mgs:
@@ -54,7 +55,7 @@ print("/P1/ Messages that match: " + str(p1_match))
 d[8] = [[42],[42,8]]
 d[11] = [[42,31],[42,11,31]]
 
-# Depth of 15 was enought for me, might vary slightly for different inputs
+# Max depth of 15 was enought for me, might vary slightly for different inputs
 re_exp = "^" + check_key(0,15) + "$"
 p2_match = 0
 for m in mgs:
